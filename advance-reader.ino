@@ -26,7 +26,14 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  // Scan until finding delimiter.
+  findDelimiter(customSerial);
+  byte command = customSerial->read();
+  switch(command)
+  {
+    case INITIALIZE:
+
+  }
 
 }
 
@@ -44,4 +51,31 @@ void findDelimiter(CustomSoftwareSerial* customSerial)
   }
   if(DEBUG)
     Serial.println("Delimiter is found.");
+}
+
+void handleInitializeFrame(CustomSoftwareSerial customSerial)
+{
+  if(DEBUG)
+    Serial.println("Processing INITIALIZE message(0x01)");
+
+  byte initMode = customSerial->read();
+  switch(initMode)
+  {
+    case INIT_STEP0:
+      if(DEBUG)
+        Serial.println("INITIALIZE_STEP0.");
+      break;
+    case INIT_STEP1:
+      if(DEBUG)
+        Serial.println("INITIALIZE_STEP1.");
+      break;
+    case INIT_STEP2:
+      if(DEBUG)
+        Serial.println("INITIALIZE_STEP2.");
+      break;
+    case INIT_STEP3:
+      if(DEBUG)
+        Serial.println("INITIALIZE_STEP3.");
+      break;
+  }
 }
