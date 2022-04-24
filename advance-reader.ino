@@ -2,6 +2,16 @@
 
 const bool DEBUG=true;
 
+const byte INITIALIZE = 0x01;
+const byte ENDING = 0x02;
+const byte DATA = 0x03;
+
+const byte INIT_STEP0 = 0x01;
+const byte INIT_STEP1 = 0x11;
+const byte INIT_STEP2 = 0x21;
+const byte INIT_STEP3 = 0x31;
+
+
 CustomSoftwareSerial* customSerial;  
 
 void setup() {
