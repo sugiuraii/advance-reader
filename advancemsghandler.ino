@@ -172,7 +172,26 @@ void handleMeterTypeQuery(CustomSoftwareSerial* ser, byte* frameContent)
 }
 
 void handleDataFrame(CustomSoftwareSerial* ser, byte* frameContent) {
-  // TODO : Implement data frame handling code.
+  unsigned int tacho = (frameContent[11] << 8) + frameContent[10];
+  unsigned int boost = (frameContent[13] << 8) + frameContent[12];
+  unsigned int oilpres = (frameContent[15] << 8) + frameContent[14];
+  unsigned int fuelpres = (frameContent[17] << 8) + frameContent[16];
+  unsigned int oiltemp = (frameContent[19] << 8) + frameContent[18];
+  unsigned int watertemp = (frameContent[21] << 8) + frameContent[20];
+  unsigned int exttemp = (frameContent[23] << 8) + frameContent[22];
+  Serial.print("Rev:");
+  Serial.println(String(tacho));
+  Serial.print("Boost:");
+  Serial.println(String(boost));
+  Serial.print("OilPres:");
+  Serial.println(String(oilpres));
+  Serial.print("FUelPres:");
+  Serial.println(String(fuelpres));
+  Serial.print("OilTemp:");
+  Serial.println(String(oiltemp));
+  Serial.print("WaterTemp:");
+  Serial.println(String(exttemp));
+  Serial.print("EXtTemp:");
 }
 
 void sendData(CustomSoftwareSerial* ser,  byte dat[], int siz) 
