@@ -1,4 +1,4 @@
 #pragma once
 #include <CustomSoftwareSerial.h>
 
-void readSerial(CustomSoftwareSerial ser);
+void readSerialMain(CustomSoftwareSerial* ser);

@@ -17,30 +17,33 @@ const byte INIT_STEP1 = 0x11;
 const byte INIT_STEP2 = 0x21;
 const byte INIT_STEP3 = 0x31;
 
+
 #define SIZEM(a)  (sizeof((a)) / sizeof((a[0])))
 
 byte msgBuffer[40];
 int msgByteCount = 0;
 
 
-void readSerialMain(CustomSoftwareSerial ser)
+void readSerialMain(CustomSoftwareSerial* ser)
 {
   static byte state = SEEK_DELIMITER;
   static byte commandByte = 0x00;
-  switch(state)
-  {
-    case SEEK_DELIMITER:
-      if(seekDelimiter(ser))
-        state = READ_COMMANDBYTE;
-      break;
-    case READ_COMMANDBYTE:
+  if(ser->available()) {
+    switch(state)
+    {
+      case SEEK_DELIMITER:
+        if(seekDelimiter(ser))
+          state = READ_COMMANDBYTE;
+        break;
+      case READ_COMMANDBYTE:
         commandByte = ser->read();
         state = READ_CONTENTS;
-      break;
-    case READ_CONTENTS:
+        break;
+      case READ_CONTENTS:
         if(readContents(ser, commandByte))
           state=SEEK_DELIMITER;
-      break;
+        break;
+    }
   }
 }
 
@@ -66,15 +69,38 @@ bool seekDelimiter(CustomSoftwareSerial* ser)
 
 bool readContents(CustomSoftwareSerial* ser, byte comandByte)
 {
-  
+  switch(comandByte) {
+    case INITIALIZE:
+      if(ser->available() > 22) {
+          byte content[22];
+          readData(ser, content, 22);
+          handleInitializeFrame(ser, content);
+          return true;
+      }
+      else
+        return false;
+      break;
+    case ENDING:
+      return true; // Do nothing on ENDING command.
+      break;
+    case DATA:
+      if(ser->available() > 30) {
+        byte content[30];
+        readData(ser, content, 30);
+        handleDataFrame(ser, content);
+        return true;
+      }
+      else
+        return false;
+  }
 }
 
-void handleInitializeFrame(CustomSoftwareSerial* customSerial)
+void handleInitializeFrame(CustomSoftwareSerial* ser, byte* frameContent)
 {
   if(DEBUG)
     Serial.println("Processing INITIALIZE message(0x01)");
 
-  byte initMode = customSerial->read();
+  byte initMode = frameContent[0];
   switch(initMode)
   {
     case INIT_STEP0:
@@ -88,7 +114,7 @@ void handleInitializeFrame(CustomSoftwareSerial* customSerial)
     case INIT_STEP2:
       if(DEBUG)
         Serial.println("INITIALIZE_STEP2.");
-        handleMeterTypeQuery(customSerial);
+        handleMeterTypeQuery(ser, frameContent);
       break;
     case INIT_STEP3:
       if(DEBUG)
@@ -97,13 +123,12 @@ void handleInitializeFrame(CustomSoftwareSerial* customSerial)
   }
 }
 
-void handleMeterTypeQuery(CustomSoftwareSerial* customSerial)
+void handleMeterTypeQuery(CustomSoftwareSerial* ser, byte* frameContent)
 {
   if(DEBUG)
     Serial.println("Handle meter type query.");
 
-  skipRead(customSerial, 20);
-  byte meterID = customSerial->read();
+  byte meterID = frameContent[21];
   byte returnData[] = {0, 0xFF, 0xFF, 0x0A, 0x00, 0, 0};
 
   switch(meterID)
@@ -113,35 +138,35 @@ void handleMeterTypeQuery(CustomSoftwareSerial* customSerial)
         Serial.println("Return meter type ID 1 = 0x01(Boost).");
 
       returnData[4] = 0x01; // Boost
-      sendData(returnData, SIZEM(returnData));
+      sendData(ser, returnData, SIZEM(returnData));
       break;
     case 0x02:
       if(DEBUG)
         Serial.println("Return meter type ID 2 = 0x06(Rev).");
 
       returnData[4] = 0x06; // Rev
-      sendData(returnData, SIZEM(returnData));
+      sendData(ser, returnData, SIZEM(returnData));
       break;
     case 0x03:
       if(DEBUG)
         Serial.println("Return meter type ID 3 = 0x09(Oil pres).");
 
       returnData[4] = 0x09; // Oil pres
-      sendData(returnData, SIZEM(returnData));
+      sendData(ser, returnData, SIZEM(returnData));
       break;
     case 0x04:
       if(DEBUG)
         Serial.println("Return meter type ID 4 = 0x0B(Oil temp).");
 
       returnData[4] = 0x0B; // Oil temp
-      sendData(returnData, SIZEM(returnData));
+      sendData(ser, returnData, SIZEM(returnData));
       break;
     case 0x05:
       if(DEBUG)
         Serial.println("Return meter type ID 5 = 0x0c(Water temp).");
 
       returnData[4] = 0x0C; // Water temp
-      sendData(returnData, SIZEM(returnData));
+      sendData(ser, returnData, SIZEM(returnData));
       break;
     default:
        if(DEBUG)
@@ -150,9 +175,19 @@ void handleMeterTypeQuery(CustomSoftwareSerial* customSerial)
   }
 }
 
-void sendData(byte dat[], int siz) 
+void handleDataFrame(CustomSoftwareSerial* ser, byte* frameContent) {
+  // TODO : Implement data frame handling code.
+}
+
+void sendData(CustomSoftwareSerial* ser,  byte dat[], int siz) 
 {
   for(int i = 0; i < siz; i++) {
-    customSerial->write(dat[i]);
+    ser->write(dat[i]);
   }
+}
+
+void readData(CustomSoftwareSerial* ser, byte* dat, int siz)
+{
+  for(int i = 0; i < siz; i++)
+    dat[i] = ser->read();
 }

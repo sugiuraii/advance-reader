@@ -1,4 +1,5 @@
 #include <CustomSoftwareSerial.h>
+#include "advancemsghandler.h"
 
 CustomSoftwareSerial* customSerial;  
 
@@ -15,15 +16,5 @@ void setup() {
 }
 
 void loop() {
-  // Scan until finding delimiter.
-  findDelimiter(customSerial);
-  byte command = customSerial->read();
-  switch(command)
-  {
-    case INITIALIZE:
-      handleInitializeFrame(customSerial);
-      break;
-  }
-
+  readSerialMain(customSerial);
 }
-
