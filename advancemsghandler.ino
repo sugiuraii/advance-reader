@@ -20,10 +20,6 @@ const byte INIT_STEP3 = 0x31;
 
 #define SIZEM(a)  (sizeof((a)) / sizeof((a[0])))
 
-byte msgBuffer[40];
-int msgByteCount = 0;
-
-
 void readSerialMain(CustomSoftwareSerial* ser)
 {
   static byte state = SEEK_DELIMITER;
