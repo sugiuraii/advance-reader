@@ -54,7 +54,7 @@ bool seekDelimiter(CustomSoftwareSerial* ser)
     buf[1]=buf[2];
     buf[2]=customSerial->read();
 
-    if(buf[0] == 0x00 && buf[0] == 0xFF && buf[0] == 0xFF) {
+    if(buf[0] == 0x00 && buf[1] == 0xFF && buf[2] == 0xFF) {
       if(DEBUG)
         Serial.println("Delimiter is found.");
       return true;
