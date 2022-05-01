@@ -24,6 +24,15 @@ void readSerialMain(CustomSoftwareSerial* ser)
 {
   static byte state = SEEK_DELIMITER;
   static byte commandByte = 0x00;
+  
+  if(ser->overflow())
+  {
+    ser->flush();
+    state = SEEK_DELIMITER;
+    commandByte = 0x00;
+    return;
+  }
+   
   if(ser->available()) {
     switch(state)
     {
