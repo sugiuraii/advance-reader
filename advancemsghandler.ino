@@ -67,7 +67,7 @@ bool readContents(CustomSoftwareSerial* ser, byte comandByte)
 {
   switch(comandByte) {
     case INITIALIZE:
-      if(ser->available() > 22) {
+      if(ser->available() >= 22) {
           byte content[22];
           readData(ser, content, 22);
           handleInitializeFrame(ser, content);
@@ -80,7 +80,7 @@ bool readContents(CustomSoftwareSerial* ser, byte comandByte)
       return true; // Do nothing on ENDING command.
       break;
     case DATA:
-      if(ser->available() > 30) {
+      if(ser->available() >= 30) {
         byte content[30];
         readData(ser, content, 30);
         handleDataFrame(ser, content);
