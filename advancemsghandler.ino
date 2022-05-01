@@ -194,13 +194,14 @@ void handleDataFrame(CustomSoftwareSerial* ser, byte* frameContent) {
   Serial.println(String(boost));
   Serial.print("OilPres:");
   Serial.println(String(oilpres));
-  Serial.print("FUelPres:");
+  Serial.print("FuelPres:");
   Serial.println(String(fuelpres));
   Serial.print("OilTemp:");
   Serial.println(String(oiltemp));
   Serial.print("WaterTemp:");
-  Serial.println(String(exttemp));
+  Serial.println(String(watertemp));
   Serial.print("EXtTemp:");
+  Serial.println(String(exttemp));
 }
 
 void sendData(CustomSoftwareSerial* ser,  byte dat[], int siz) 
