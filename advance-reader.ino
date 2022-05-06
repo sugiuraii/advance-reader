@@ -5,7 +5,7 @@ CustomSoftwareSerial* customSerial;
 
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(19200);
   delay(10);
   
   Serial.println("Start Setup");

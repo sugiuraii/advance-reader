@@ -17,37 +17,37 @@ const byte INIT_STEP1 = 0x11;
 const byte INIT_STEP2 = 0x21;
 const byte INIT_STEP3 = 0x31;
 
-
 #define SIZEM(a)  (sizeof((a)) / sizeof((a[0])))
 
 void readSerialMain(CustomSoftwareSerial* ser)
 {
   static byte state = SEEK_DELIMITER;
   static byte commandByte = 0x00;
-  
-  if(ser->overflow())
-  {
-    ser->flush();
-    state = SEEK_DELIMITER;
-    commandByte = 0x00;
-    return;
-  }
-   
-  if(ser->available()) {
-    switch(state)
-    {
-      case SEEK_DELIMITER:
-        if(seekDelimiter(ser))
-          state = READ_COMMANDBYTE;
-        break;
-      case READ_COMMANDBYTE:
-        commandByte = ser->read();
-        state = READ_CONTENTS;
-        break;
-      case READ_CONTENTS:
-        if(readContents(ser, commandByte))
-          state=SEEK_DELIMITER;
-        break;
+
+  uint8_t serbufcnt = ser->available();
+  if(serbufcnt > 0) {
+    if(ser->overflow()) {
+      ser->flush();
+      state = SEEK_DELIMITER;
+      commandByte = 0x00;
+      return;
+    }
+    else {
+      switch(state)
+      {
+        case SEEK_DELIMITER:
+          if(seekDelimiter(ser))
+            state = READ_COMMANDBYTE;
+          break;
+        case READ_COMMANDBYTE:
+          commandByte = ser->read();
+          state = READ_CONTENTS;
+          break;
+        case READ_CONTENTS:
+          if(readContents(ser, serbufcnt, commandByte))
+            state=SEEK_DELIMITER;
+          break;
+      }
     }
   }
 }
@@ -72,11 +72,11 @@ bool seekDelimiter(CustomSoftwareSerial* ser)
     return false;
 }
 
-bool readContents(CustomSoftwareSerial* ser, byte comandByte)
+bool readContents(CustomSoftwareSerial* ser, uint8_t serbufcnt, byte comandByte)
 {
   switch(comandByte) {
     case INITIALIZE:
-      if(ser->available() >= 22) {
+      if(serbufcnt >= 22) {
           byte content[22];
           readData(ser, content, 22);
           handleInitializeFrame(ser, content);
@@ -89,10 +89,11 @@ bool readContents(CustomSoftwareSerial* ser, byte comandByte)
       return true; // Do nothing on ENDING command.
       break;
     case DATA:
-      if(ser->available() >= 30) {
+      if(serbufcnt >= 30) {
         byte content[30];
         readData(ser, content, 30);
         handleDataFrame(ser, content);
+        Serial.println(ser->available());
         return true;
       }
       else
@@ -188,20 +189,20 @@ void handleDataFrame(CustomSoftwareSerial* ser, byte* frameContent) {
   unsigned int oiltemp = (frameContent[19] << 8) + frameContent[18];
   unsigned int watertemp = (frameContent[21] << 8) + frameContent[20];
   unsigned int exttemp = (frameContent[23] << 8) + frameContent[22];
-  Serial.print("Rv:");
-  Serial.println(String(tacho, HEX));
-  Serial.print("Bst:");
-  Serial.println(String(boost, HEX));
-  Serial.print("OPr:");
-  Serial.println(String(oilpres, HEX));
-  Serial.print("FPr:");
-  Serial.println(String(fuelpres, HEX));
-  Serial.print("OTmp:");
-  Serial.println(String(oiltemp, HEX));
-  Serial.print("WTmp:");
-  Serial.println(String(watertemp, HEX));
-  Serial.print("ETmp:");
-  Serial.println(String(exttemp, HEX));
+  Serial.print("A");
+  Serial.print(String(tacho, HEX));
+  Serial.print("B");
+  Serial.print(String(boost, HEX));
+  Serial.print("C");
+  Serial.print(String(oilpres, HEX));
+  Serial.print("D");
+  Serial.print(String(fuelpres, HEX));
+  Serial.print("E");
+  Serial.print(String(oiltemp, HEX));
+  Serial.print("F");
+  Serial.print(String(watertemp, HEX));
+  Serial.print("G");
+  Serial.print(String(exttemp, HEX));
 }
 
 void sendData(CustomSoftwareSerial* ser,  byte dat[], int siz) 
