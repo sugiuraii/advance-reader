@@ -1,6 +1,6 @@
 #include <CustomSoftwareSerial.h>
 
-const bool DEBUG=true;
+const bool DEBUG=false;
 
 // State flag
 const byte SEEK_DELIMITER = 0x01;
@@ -188,20 +188,20 @@ void handleDataFrame(CustomSoftwareSerial* ser, byte* frameContent) {
   unsigned int oiltemp = (frameContent[19] << 8) + frameContent[18];
   unsigned int watertemp = (frameContent[21] << 8) + frameContent[20];
   unsigned int exttemp = (frameContent[23] << 8) + frameContent[22];
-  Serial.print("Rev:");
-  Serial.println(String(tacho));
-  Serial.print("Boost:");
-  Serial.println(String(boost));
-  Serial.print("OilPres:");
-  Serial.println(String(oilpres));
-  Serial.print("FuelPres:");
-  Serial.println(String(fuelpres));
-  Serial.print("OilTemp:");
-  Serial.println(String(oiltemp));
-  Serial.print("WaterTemp:");
-  Serial.println(String(watertemp));
-  Serial.print("EXtTemp:");
-  Serial.println(String(exttemp));
+  Serial.print("Rv:");
+  Serial.println(String(tacho, HEX));
+  Serial.print("Bst:");
+  Serial.println(String(boost, HEX));
+  Serial.print("OPr:");
+  Serial.println(String(oilpres, HEX));
+  Serial.print("FPr:");
+  Serial.println(String(fuelpres, HEX));
+  Serial.print("OTmp:");
+  Serial.println(String(oiltemp, HEX));
+  Serial.print("WTmp:");
+  Serial.println(String(watertemp, HEX));
+  Serial.print("ETmp:");
+  Serial.println(String(exttemp, HEX));
 }
 
 void sendData(CustomSoftwareSerial* ser,  byte dat[], int siz) 
