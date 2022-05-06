@@ -182,27 +182,36 @@ void handleMeterTypeQuery(CustomSoftwareSerial* ser, byte* frameContent)
 }
 
 void handleDataFrame(CustomSoftwareSerial* ser, byte* frameContent) {
-  unsigned int tacho = (frameContent[11] << 8) + frameContent[10];
-  unsigned int boost = (frameContent[13] << 8) + frameContent[12];
-  unsigned int oilpres = (frameContent[15] << 8) + frameContent[14];
-  unsigned int fuelpres = (frameContent[17] << 8) + frameContent[16];
-  unsigned int oiltemp = (frameContent[19] << 8) + frameContent[18];
-  unsigned int watertemp = (frameContent[21] << 8) + frameContent[20];
-  unsigned int exttemp = (frameContent[23] << 8) + frameContent[22];
-  Serial.print("A");
-  Serial.print(String(tacho, HEX));
-  Serial.print("B");
-  Serial.print(String(boost, HEX));
-  Serial.print("C");
-  Serial.print(String(oilpres, HEX));
-  Serial.print("D");
-  Serial.print(String(fuelpres, HEX));
-  Serial.print("E");
-  Serial.print(String(oiltemp, HEX));
-  Serial.print("F");
-  Serial.print(String(watertemp, HEX));
-  Serial.print("G");
-  Serial.print(String(exttemp, HEX));
+  uint16_t rev = (frameContent[11] << 8) + frameContent[10];
+  uint16_t boost = (frameContent[13] << 8) + frameContent[12];
+  uint16_t oilpres = (frameContent[15] << 8) + frameContent[14];
+  uint16_t fuelpres = (frameContent[17] << 8) + frameContent[16];
+  uint16_t oiltemp = (frameContent[19] << 8) + frameContent[18];
+  uint16_t watertemp = (frameContent[21] << 8) + frameContent[20];
+  uint16_t exttemp = (frameContent[23] << 8) + frameContent[22];
+  sendDataFrameToHost('A', rev);
+  sendDataFrameToHost('B', boost);
+  sendDataFrameToHost('C', oilpres);
+  sendDataFrameToHost('D', fuelpres);
+  sendDataFrameToHost('E', oiltemp);
+  sendDataFrameToHost('F', watertemp);
+  sendDataFrameToHost('G', exttemp);
+}
+
+void sendDataFrameToHost(char header, uint16_t value)
+{
+  byte obuf[5];
+  obuf[0] = header;
+  for(uint8_t i = 0; i < 4; i++) {
+    uint8_t shift = i * 4;
+    uint16_t mask = 0x000F << shift;
+    byte outval = (value & mask) >> shift;
+    if(outval < 10)
+      obuf[i+1] = outval + 0x30;
+    else
+      obuf[i+1] = outval - 10 + 0x61;
+  }
+  Serial.write(obuf, 5);
 }
 
 void sendData(CustomSoftwareSerial* ser,  byte dat[], int siz) 
