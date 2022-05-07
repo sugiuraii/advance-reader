@@ -27,6 +27,10 @@ void readSerialMain(CustomSoftwareSerial* ser)
   uint8_t serbufcnt = ser->available();
   if(serbufcnt > 0) {
     if(ser->overflow()) {
+      // Blink 'L' LED connected to pin13
+      digitalWrite(13, HIGH);
+      digitalWrite(13, LOW);
+      
       ser->flush();
       state = SEEK_DELIMITER;
       commandByte = 0x00;
