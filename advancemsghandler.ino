@@ -31,7 +31,8 @@ void readSerialMain(CustomSoftwareSerial* ser)
       digitalWrite(13, HIGH);
       digitalWrite(13, LOW);
       
-      ser->flush();
+      // Clear buffer.
+      while(ser->read() >= 0);
       state = SEEK_DELIMITER;
       commandByte = 0x00;
       return;
