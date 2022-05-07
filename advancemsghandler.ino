@@ -203,7 +203,7 @@ void sendDataFrameToHost(char header, uint16_t value)
   byte obuf[5];
   obuf[0] = header;
   for(uint8_t i = 0; i < 4; i++) {
-    uint8_t shift = i * 4;
+    uint8_t shift = (3 - i) * 4;
     uint16_t mask = 0x000F << shift;
     byte outval = (value & mask) >> shift;
     if(outval < 10)
