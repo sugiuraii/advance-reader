@@ -7,8 +7,6 @@ CustomSoftwareSerial* customSerial;
 void setup() {
   Serial.begin(19200);
   delay(10);
-  
-  Serial.println("Start Setup");
 
   // For overflow indicator
   pinMode(13,OUTPUT);
