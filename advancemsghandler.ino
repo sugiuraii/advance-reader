@@ -200,7 +200,7 @@ void handleDataFrame(CustomSoftwareSerial* ser, byte* frameContent) {
   sendDataFrameToHost('E', oiltemp);
   sendDataFrameToHost('F', watertemp);
   sendDataFrameToHost('G', exttemp);
-  Serial.write(0x0a);
+  //Serial.write(0x0a);
 }
 
 void sendDataFrameToHost(char header, uint16_t value)
