@@ -98,7 +98,6 @@ bool readContents(CustomSoftwareSerial* ser, uint8_t serbufcnt, byte comandByte)
         byte content[30];
         readData(ser, content, 30);
         handleDataFrame(ser, content);
-        Serial.println(ser->available());
         return true;
       }
       else
@@ -201,6 +200,7 @@ void handleDataFrame(CustomSoftwareSerial* ser, byte* frameContent) {
   sendDataFrameToHost('E', oiltemp);
   sendDataFrameToHost('F', watertemp);
   sendDataFrameToHost('G', exttemp);
+  Serial.write(0x0a);
 }
 
 void sendDataFrameToHost(char header, uint16_t value)
